@@ -5,8 +5,7 @@ Github monitoring
 
 A Docker stack which monitors my Github repositories
 
-![Screenshot](screenshot.png)
-
+![dashboard](dashboard.png)
 
 ## Installation
 
@@ -47,4 +46,3 @@ Now we need to create the Prometheus Datasource in order to connect Grafana to P
 
 Import the dashboard **github-dashboard.json** into Grafana.
 
-![dashboard](dashboard.png)
