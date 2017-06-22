@@ -1,0 +1,61 @@
+version: "2"
+
+volumes:
+    prometheus_data: {}
+    grafana_data: {}
+
+networks:
+  front-tier:
+    driver: bridge
+  back-tier:
+    driver: bridge
+
+services:
+  prometheus:
+    image: prom/prometheus
+    container_name: prometheus
+    volumes:
+      - .:/etc/prometheus/
+      - prometheus_data:/prometheus
+    command:
+      - '-config.file=/etc/prometheus/prometheus.yml'
+      - '-storage.local.path=/prometheus'
+    expose:
+      - 9090
+    ports:
+      - 9090:9090
+    links:
+      - metrics:metrics
+    networks:
+      - back-tier
+
+  grafana:
+    image: grafana/grafana
+    depends_on:
+      - prometheus
+    ports:
+      - 3000:3000
+    volumes:
+      - grafana_data:/var/lib/grafana
+        #env_file:
+        #- config.monitoring
+    networks:
+      - back-tier
+      - front-tier
+ 
+  metrics:
+    tty: true
+    stdin_open: true
+    expose:
+      - 9171
+    ports:
+      - 9171:9171
+    image: infinityworks/github-exporter:latest 
+    env_file:
+      - github.env
+    environment:
+      - LOG_LEVEL=debug
+      - ORGS=pilotariak, zeiot
+      - REPOS=nlamirault/scame, nlamirault/nyx, nlamirault/divona, nlamirault/blinky, nlamirault/abraracourcix, nlamirault/ripgrep.el, nlamirault/gotest.el, nlamirault/phpunit.el, nlamirault/pihole_exporter, nlamirault/timonier, nlamirault/sift.el, nlamirault/marcopolo, nlamirault/dionysos, nlamirault/emacs-gitlab, nlamirault/emacs-travis, nlamirault/skybox, nlamirault/mert, nlamirault/chione, nlamirault/speedtest_exporter, nlamirault/bento, nlamirault/guzuta, nlamirault/happy, nlamirault/domoticz_exporter, nlamirault/framboise, nlamirault/helmsman, nlamirault/k8s-bot, nlamirault/enigma, nlamirault/shiva, nlamirault/actarus
+    networks:
+      - back-tier
